@@ -1,3 +1,16 @@
 body {
 	background-color: #0f0f23;
 }
+
+input {
+  border: 0;
+  background-color: inherit;
+  border-bottom: 1px solid #fff;
+  color: #fff;
+}
+
+textarea, input { outline: none; }
+
+#adminUser input, #adminPass input {
+	font-size: 50px;
+}
