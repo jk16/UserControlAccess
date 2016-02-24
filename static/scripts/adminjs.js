@@ -5,10 +5,9 @@ $(document).ready(function() {
 
 
 	$adminForm.on('submit', function(e) {
-
-		if(isUserNameSubmitted) {
+		if($adminForm.is(".userStep")) {
 			e.preventDefault();
-
+			$adminForm.removeClass("userStep");
 			$adminUser.hide();
 			$adminPass.show();
 		}
