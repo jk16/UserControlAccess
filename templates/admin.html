@@ -9,14 +9,16 @@
 <body>
 	<div>
 		<div id="adminLoginPanel" >
-			<form id="adminUserForm">
-				<input type="text" name="adminLogin" id="adminUser">
-				<input type="submit" value="loginSubmit" style="display:none">
-			</form>
 
-			<form id="adminPassForm" style="display:none">
-				<input type="password" name="adminPass" id="adminPass" >
-				<input type="submit" value="passSubmit" style="display:none">
+			<form id="adminForm">
+				<div id="adminUser">
+					<input type="text" name="adminUser" value="user">
+				</div>
+				<div id="adminPass" style="display:none">
+					<ingput type="password" name="adminPass" value="password">
+				</div>
+
+				<input type="submit" value="login" style="display:none">
 			</form>
 
 		</div>
