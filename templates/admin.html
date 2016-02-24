@@ -3,22 +3,24 @@
 <head>
 	<title>Enter Code</title>
 	<link rel="stylesheet" type="text/css" href="/static/styles.css"/>
+	<script src="/static/scripts/jquery-2.2.1.min.js"></script>
     <script src="/static/scripts/adminjs.js"></script>
-    <script src="/static/scripts/jquery-2.2.1.min.js"></script>
 </head>
 <body>
 	<div>
 		<div id="adminLoginPanel" >
 
-			<form id="adminForm">
+			<form id="adminForm" class="userStep">
+
 				<div id="adminUser">
-					<input type="text" name="adminUser" value="user">
-				</div>
-				<div id="adminPass" style="display:none">
-					<ingput type="password" name="adminPass" value="password">
+					<input type="text" name="adminUser" value="">
 				</div>
 
-				<input type="submit" value="login" style="display:none">
+				<div id="adminPass" style="display:none">
+					<input type="password" name="adminPass" value="">
+				</div>
+
+				<input type="submit" value="Login" style="display:none">
 			</form>
 
 		</div>
