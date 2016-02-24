@@ -1,14 +1,17 @@
 $(document).ready(function() {
-	$adminUserForm = $("#adminUserForm");
-	$adminPassForm = $("#adminPassForm");
+	$adminForm = $("#adminForm");
+	$adminUser = $("#adminUser");
+	$adminPass = $("#adminPass");
 
 
-	$adminUserForm.on('submit', function(e) {
-		
-		e.preventDefault();
+	$adminForm.on('submit', function(e) {
 
-		$adminUser.hide();
-		$adminPassForm.show();
+		if(isUserNameSubmitted) {
+			e.preventDefault();
+
+			$adminUser.hide();
+			$adminPass.show();
+		}
 	});
 
 
