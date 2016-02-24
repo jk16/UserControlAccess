@@ -10,30 +10,20 @@ class AdminPage(tornado.web.RequestHandler):
     def get(self):
         self.render("admin.html")
 
-class AdminCreds(tornado.web.RequestHandler):
     def post(self):
         username = self.get_argument('user')
         password = self.get_argument('pass')
         credsPassed = username == 'Admin' and password == '0'
 
-        # if (credsPassed):
-        #     response = {"success": True}
-        #     self.set_header("Content-Type", "application/json")
-        #     self.write(json.dumps(response))
-        # else:
-        #     response = {"success": False}
-        #     self.set_header("Content-Type", "application/json")
-        #     self.write(json.dumps(response))
-        # self.set_header("Content-Type", "application/json")
         if (credsPassed):
             response = {"user": username, "password": password}
-            self.write(json.dumps(response))
+            self.write(json.dumps(response))                
 
 def make_app():
     handlers = [
             (r"/", homePage),
             (r"/admin", AdminPage),
-            (r"/adminCreds", AdminCreds),
+            (r"/adminCreds", AdminPage),
         ]
 
     return tornado.web.Application(handlers,debug=True,template_path='./templates',
