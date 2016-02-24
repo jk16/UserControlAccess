@@ -1,6 +1,5 @@
 import tornado.ioloop
 import tornado.web
-import json
 
 
 class homePage(tornado.web.RequestHandler):
@@ -14,7 +13,7 @@ class AdminPage(tornado.web.RequestHandler):
 def make_app():
     handlers = [
             (r"/", homePage),
-            (r"/", AdminPage),
+            (r"/admin.html", AdminPage),
         ]
 
     return tornado.web.Application(handlers,debug=True,template_path='./templates',
