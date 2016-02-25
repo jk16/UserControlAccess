@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Page</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css"/>
+    <script src="/static/scripts/jquery-2.2.1.min.js"></script>
+    <script src="/static/scripts/memberjs.js"></script>
+</head>
+<body>
+{% if userInJSON %}
+        <div>
+            <div id="memberLoginPanel" >
+                <form id="memberForm" class="userStep">
+
+                <div id="memberUser">
+                    <input type="text" name="memberUser" value={{memberVal}}>
+                </div>
+
+                <div id="memberPass" style="display:none">
+                    <input type="password" name="memberPass" placeholder="Password">
+                </div>
+
+                <input type="submit" value="Login" style="display:none">
+            </form>
+
+        </div>
+    </div>
+{% end %}
+
+{% if not userInJSON %}
+    <span id="userNotExist" style="color:#fff">User is not registered</span>
+{% end %}
+
+</body>
+</html>
