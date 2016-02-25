@@ -34,9 +34,10 @@
     </div>
 
     <div id="enterPass" style="display: none">
-        <form>
-            <input type="password" name="registerUserPass" value="Password" id="firstPassword">
-            <input type="password" name="confirmRegisterUserPass" value="Confirm password" id="confirmPass" style="display:none;">
+        <form id="userForm" class="passwordNotConfirmed">
+            <input type="password" name="registerUserPass" placeholder="Password" id="firstPassword">
+            <input type="password" name="confirmRegisterUserPass" placeholder="Confirm password" id="confirmPass" style="display:none">
+            <span id='matchingMessage'></span>
             <input type="submit" style="display:none">
         </form>
     </div>
