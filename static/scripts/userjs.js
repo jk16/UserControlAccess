@@ -28,8 +28,11 @@ $(document).ready(function() {
                 type: 'POST',
                 url: '/registerPassword',
                 data:password ,
-                success: function(e) {
-                    alert('s');
+                success: function(response) {
+                    response = JSON.parse(response);
+                    if(response.success === true) {
+                        //idk what to do yet
+                    }
                 }
             });
             //on success promt to a new page
