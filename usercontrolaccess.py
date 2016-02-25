@@ -10,23 +10,45 @@ class homePage(tornado.web.RequestHandler):
     def get(self):
         self.render('index.html')
 
+
+
 class UserPage(tornado.web.RequestHandler):
+    """
+    GET: handles logic for whether a /user is in the JSON data list
+    POST: handles user adding a password
+    **Dont handle logic verification here
+    """
     def get(self, id_):
         #validate user existence in JSON
-        user = "user" + id_
+        self.application.user = "user" + id_
         with open('data/data.json') as json_data:
             d = json.load(json_data)
             json_data.close()
-            printStuff(d)
-            user_list = d['users']
+            self.application.list_users = d
 
-        userInJSON = user in user_list
-        printStuff(not userInJSON)
+        userInJSON = any( u['user'] == self.application.user for u in self.application.list_users['users'] )
+
+        # printStuff(userInJSON)
         self.render(
             'user.html',
             memberVal = "user" + str(id_),
             userInJSON = userInJSON,
             )
+
+    def post(self):
+        password = self.get_argument("password")
+
+        new_user = {
+            "user": self.application.user, 
+            "pass":password
+            }
+
+        self.application.list_users['users'].append(new_user)
+        
+        jsonFile = open("data/data.json", "w+")
+        jsonFile.write(json.dumps(self.application.list_users))
+        jsonFile.close()
+
 
 class AdminPage(tornado.web.RequestHandler):
     def get(self):
@@ -53,6 +75,7 @@ def make_app():
             (r"/admin", AdminPage),
             (r"/adminCreds", AdminPage),
             (r"/user([0-9]+)", UserPage),
+            (r"/registerPassword", UserPage)
         ]
 
     return tornado.web.Application(handlers,debug=True,template_path='./templates',
