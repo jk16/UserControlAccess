@@ -12,16 +12,27 @@ $(document).ready(function() {
     });
 
     $userForm.on("submit", function(e){
+        e.preventDefault();
         // if user entered the first password remove .passwordNotConfirmed
         if($(this).is(".passwordNotConfirmed")) {
-            e.preventDefault();
-            $(this).removeClass(".passwordNotConfirmed");
+            $(this).removeClass("passwordNotConfirmed");
             $firstPassword.hide();
             $confirmPass.show();
         }
         //submit and does not contain .passwordNotConfirmed
         else {
             //user is submitting password
+            //add a POST
+            var password = {password: $confirmPass.val()};
+            $.ajax({
+                type: 'POST',
+                url: '/registerPassword',
+                data:password ,
+                success: function(e) {
+                    alert('s');
+                }
+            });
+            //on success promt to a new page
         }
     });
 
