@@ -6,11 +6,9 @@ import json
 def printStuff(*args):
     print(*args)
 
-class homePage(tornado.web.RequestHandler):
+class HomePage(tornado.web.RequestHandler):
     def get(self):
         self.render('index.html')
-
-
 
 class UserPage(tornado.web.RequestHandler):
     """
@@ -19,16 +17,17 @@ class UserPage(tornado.web.RequestHandler):
     **Dont handle logic verification here
     """
     def get(self, id_):
-        #validate user existence in JSON
+        #get ID from /user[0-9]+
         self.application.user = "user" + id_
         with open('data/data.json') as json_data:
             d = json.load(json_data)
             json_data.close()
             self.application.list_users = d
 
+        #validate user existence in JSON
         userInJSON = any( u['user'] == self.application.user for u in self.application.list_users['users'] )
 
-        # printStuff(userInJSON)
+        #render user.html which will load HTML based off userInJSON
         self.render(
             'user.html',
             memberVal = "user" + str(id_),
@@ -36,20 +35,24 @@ class UserPage(tornado.web.RequestHandler):
             )
 
     def post(self):
+        #get password from POST
         password = self.get_argument("password")
-
+        #new user that will be added to the users list in JSON
         new_user = {
             "user": self.application.user, 
             "pass":password
             }
 
+        # append to the users list in JSON
         self.application.list_users['users'].append(new_user)
 
         jsonFile = open("data/data.json", "w+")
         jsonFile.write(json.dumps(self.application.list_users))
         jsonFile.close()
 
+        #make response
         response = {"success": True, "message": "User has been added"}
+        #send response
         self.write(json.dumps(response))
 
 
@@ -74,7 +77,7 @@ class AdminPage(tornado.web.RequestHandler):
 
 def make_app():
     handlers = [
-            (r"/", homePage),
+            (r"/", HomePage),
             (r"/admin", AdminPage),
             (r"/adminCreds", AdminPage),
             (r"/user([0-9]+)", UserPage),
