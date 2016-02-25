@@ -44,10 +44,13 @@ class UserPage(tornado.web.RequestHandler):
             }
 
         self.application.list_users['users'].append(new_user)
-        
+
         jsonFile = open("data/data.json", "w+")
         jsonFile.write(json.dumps(self.application.list_users))
         jsonFile.close()
+
+        response = {"success": True, "message": "User has been added"}
+        self.write(json.dumps(response))
 
 
 class AdminPage(tornado.web.RequestHandler):
