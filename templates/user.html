@@ -4,7 +4,7 @@
     <title>Member Page</title>
     <link rel="stylesheet" type="text/css" href="/static/styles.css"/>
     <script src="/static/scripts/jquery-2.2.1.min.js"></script>
-    <script src="/static/scripts/memberjs.js"></script>
+    <script src="/static/scripts/userjs.js"></script>
 </head>
 <body>
 {% if userInJSON %}
@@ -28,7 +28,18 @@
 {% end %}
 
 {% if not userInJSON %}
-    <span id="userNotExist" style="color:#fff">User is not registered</span>
+    <div id="notRegPanel">
+        <span id="userNotExist" style="color:#fff">User is not registered</span>
+        <button name="button" id="register">[Register User]</button>
+    </div>
+
+    <div id="enterPass" style="display: none">
+        <form>
+            <input type="password" name="registerUserPass" value="Password" id="firstPassword">
+            <input type="password" name="confirmRegisterUserPass" value="Confirm password" id="confirmPass" style="display:none;">
+            <input type="submit" style="display:none">
+        </form>
+    </div>
 {% end %}
 
 </body>
