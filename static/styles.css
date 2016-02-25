@@ -11,6 +11,6 @@ input {
 
 textarea, input { outline: none; }
 
-#adminUser input, #adminPass input {
+#adminUser input, #adminPass input, #memberUser input, #memberPass input, #userNotExist {
 	font-size: 50px;
 }
