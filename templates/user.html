@@ -8,16 +8,12 @@
 </head>
 <body>
 {% if userInJSON %}
-        <div>
-            <div id="memberLoginPanel" >
-                <form id="memberForm" class="userStep">
+    <div>
+        <div id="memberLoginPanel" >
+            <form id="IsRegisteredForm">
 
-                <div id="memberUser">
-                    <input type="text" name="memberUser" value={{memberVal}}>
-                </div>
-
-                <div id="memberPass" style="display:none">
-                    <input type="password" name="memberPass" placeholder="Password">
+                <div id="memberPasswordBox">
+                    <input type="password" name="memberPass" placeholder="Password" id="registeredPasswordVerification">
                 </div>
 
                 <input type="submit" value="Login" style="display:none">
@@ -28,9 +24,9 @@
 {% end %}
 
 {% if not userInJSON %}
-    <div id="notRegPanel">
+    <div id="notRegisteredPanel">
         <span id="userNotExist" style="color:#fff">User is not registered</span>
-        <button name="button" id="register">[Register User]</button>
+        <button name="button" id="registerUserBtn">[Register User]</button>
     </div>
 
     <div id="enterPass" style="display: none">
