@@ -1,15 +1,37 @@
 $(document).ready(function() {
-    var $registerPassword = $("#register");
-    var $notRegPanel = $("#notRegPanel");
+    var $registerUserBtn = $("#registerUserBtn");
+    var $notRegisteredPanel = $("#notRegisteredPanel");
     var $enterPass = $("#enterPass");
     var $firstPassword = $("#firstPassword");
     var $confirmPass = $("#confirmPass");
     var $userForm = $("#userForm");
     //user does not exist, register password
-    $registerPassword.click(function() {
-        $notRegPanel.hide();
+    $registerUserBtn.click(function() {
+        $notRegisteredPanel.hide();
         $enterPass.show();
     });
+    //user exists, login
+    $("#IsRegisteredForm").on("submit",function(e){
+        e.preventDefault();
+
+        //enter password
+        var enteredPassword = $("#registeredPasswordVerification").val();
+
+        var message = {password: enteredPassword};
+        $.ajax({
+            type: 'POST',
+            url: '/verifyPassword',
+            data: message,
+            success: function(response) {
+                parsedResponse = JSON.parse(response);
+                console.log(parsedResponse);
+            }
+        });
+
+
+    });
+
+
 
     $userForm.on("submit", function(e){
         e.preventDefault();
@@ -27,11 +49,19 @@ $(document).ready(function() {
             $.ajax({
                 type: 'POST',
                 url: '/registerPassword',
-                data:password ,
+                data: password,
                 success: function(response) {
                     response = JSON.parse(response);
+                    $(this).hide();
+                    var welcome_user_html = '';
                     if(response.success === true) {
                         //idk what to do yet
+                        welcome_user_html = "<span>User Registered!</span>";
+                        $(this).append(welcome_user_html);
+                    }
+                    else {
+                        welcome_user_html = "<span>User Not Registered!</span>";
+                        $enterPass.append(welcome_user_html);
                     }
                 }
             });
