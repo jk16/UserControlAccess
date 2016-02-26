@@ -10,32 +10,40 @@ class HomePage(tornado.web.RequestHandler):
     def get(self):
         self.render('index.html')
 
-class UserPage(tornado.web.RequestHandler):
+class NewUserLoginHandler(tornado.web.RequestHandler):
     """
     GET: handles logic for whether a /user is in the JSON data list
     POST: handles user adding a password
-    **Dont handle logic verification here
     """
     def get(self, id_):
         #get ID from /user[0-9]+
         self.application.user = "user" + id_
+
         with open('data/data.json') as json_data:
             d = json.load(json_data)
             json_data.close()
-            self.application.list_users = d
+            """
+                {"users": [ { "user111": 1} ], "admin": 0}
+            """
+            self.application.list_of_dict_users = d['users']
 
-        #validate user existence in JSON
-        userInJSON = any( u['user'] == self.application.user for u in self.application.list_users['users'] )
+
+        for usernameDict in self.application.list_of_dict_users:
+            self.application.userInJSON = any( userName == self.application.user for userName in usernameDict )
+            if self.application.userInJSON:
+                self.application.password = usernameDict[self.application.user]
+
 
         #render user.html which will load HTML based off userInJSON
         self.render(
             'user.html',
             memberVal = "user" + str(id_),
-            userInJSON = userInJSON,
+            userInJSON = self.application.userInJSON,
             )
 
     def post(self):
         #get password from POST
+        printStuff('after the not userInJSON')
         password = self.get_argument("password")
         #new user that will be added to the users list in JSON
         new_user = {
@@ -56,7 +64,7 @@ class UserPage(tornado.web.RequestHandler):
         self.write(json.dumps(response))
 
 
-class AdminPage(tornado.web.RequestHandler):
+class AdminLoginHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("admin.html")
 
@@ -73,15 +81,29 @@ class AdminPage(tornado.web.RequestHandler):
         else:
             count_login_attempts +=1
             response = {"success": False, "user": username, "password": password}
-            self.write(json.dumps(response))           
+            self.write(json.dumps(response))
+
+class UserLoginHandler(tornado.web.RequestHandler):
+    def post(self):
+        submittedPassword = self.get_argument("password")
+        if self.application.password == submittedPassword:
+            response = {"success": True}
+            self.write(json.dumps(response))
+            self.render('index.html')
+        else:
+            response = {"success": False}
+            self.write(json.dumps(response))
+
+
 
 def make_app():
     handlers = [
             (r"/", HomePage),
-            (r"/admin", AdminPage),
-            (r"/adminCreds", AdminPage),
-            (r"/user([0-9]+)", UserPage),
-            (r"/registerPassword", UserPage)
+            (r"/admin", AdminLoginHandler),
+            (r"/adminCreds", AdminLoginHandler),
+            (r"/user([0-9]+)", NewUserLoginHandler),
+            (r"/registerPassword", NewUserLoginHandler),
+            (r"/verifyPassword", UserLoginHandler),
         ]
 
     return tornado.web.Application(handlers,debug=True,template_path='./templates',
