@@ -57,7 +57,7 @@ $(document).ready(function() {
                     var welcome_user_html = '';
                     if(response.success === true) {
                         //idk what to do yet
-                        $.get(""/,function(data) {
+                        $.get("/",function(data) {
 
                         });
                     }
