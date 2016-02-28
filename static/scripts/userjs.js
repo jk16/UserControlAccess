@@ -53,13 +53,16 @@ $(document).ready(function() {
                 success: function(response) {
                     response = JSON.parse(response);
                     $(this).hide();
+                    console.log(response.success);
                     var welcome_user_html = '';
                     if(response.success === true) {
                         //idk what to do yet
-                        welcome_user_html = "<span>User Registered!</span>";
-                        $(this).append(welcome_user_html);
+                        $.get(""/,function(data) {
+
+                        });
                     }
                     else {
+                        alert('false')
                         welcome_user_html = "<span>User Not Registered!</span>";
                         $enterPass.append(welcome_user_html);
                     }
