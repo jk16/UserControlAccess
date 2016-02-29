@@ -3,6 +3,46 @@ import tornado.web
 import json
 
 
+class User():
+    def __init__(self, uName):
+        self.user_permission = {} #{operation: specific}
+
+    def __repr__(self):
+        return "test()"
+
+    def __str__(self, *args):
+        return str(*args)
+
+    def add_user_permission(self, perm_tuple):
+        """
+        Takes in a permission tuple: (operation,specific)
+        """
+        specific = perm_tuple[1]
+        operation = perm_tuple[0]
+        self.user_permission[operation] = specific
+
+    def has_permission(self, operation, specific):
+        """action on a user"""
+
+        """
+        {"view": "alberto"}
+        
+        """
+
+        return True if specific in self.user_permission[operation] else False 
+
+def test():
+    john = User('john')
+    alberto = User('alberto') 
+
+
+    alberto.add_user_permission( ("view","john") )
+    test_if_has_permission = alberto.has_permission("view","john")
+    print (test_if_has_permission)
+
+
+
+
 def printStuff(*args):
     print(*args)
 
@@ -25,6 +65,9 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
             """
                 {"users": [ { "user111": 1} ], "admin": 0}
             """
+            #stores {"users": [ { "user111": 1} ], "admin": 0}
+            self.application.dict_of_users = d 
+            #stores "users": [ { "user111": 1} ]
             self.application.list_of_dict_users = d['users']
 
 
@@ -43,25 +86,24 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
 
     def post(self):
         #get password from POST
-        printStuff('after the not userInJSON')
         password = self.get_argument("password")
         #new user that will be added to the users list in JSON
         new_user = {
-            "user": self.application.user, 
-            "pass":password
+            self.application.user: password
             }
 
         # append to the users list in JSON
-        self.application.list_users['users'].append(new_user)
+        self.application.list_of_dict_users.append(new_user)
 
-        jsonFile = open("data/data.json", "w+")
-        jsonFile.write(json.dumps(self.application.list_users))
-        jsonFile.close()
+        # jsonFile = open("data/data.json", "w+")
+        # jsonFile.write(json.dumps(self.application.dict_of_users))
+        # jsonFile.close()
 
         #make response
         response = {"success": True, "message": "User has been added"}
         #send response
         self.write(json.dumps(response))
+
 
 
 class AdminLoginHandler(tornado.web.RequestHandler):
