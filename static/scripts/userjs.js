@@ -40,8 +40,7 @@ $(document).ready(function() {
                     // alert('verify')
                     parsedResponse = JSON.parse(response);
                     if(parsedResponse.success) {
-                        var page = "/"+user + "/panel";
-                        redirect(page);
+                        redirect("/panel");
                     }
                 }
             });
@@ -73,8 +72,7 @@ $(document).ready(function() {
                     response = JSON.parse(response);
                     if(response.success) {
                         //redirect to success
-                        var page = "/"+response.userName + "/panel";
-                        redirect(page);
+                        redirect("/panel");
                     }
                     else {
                         //redirect to fail
