@@ -2,69 +2,82 @@ $(document).ready(function() {
     var $registerUserBtn = $("#registerUserBtn");
     var $notRegisteredPanel = $("#notRegisteredPanel");
     var $enterPass = $("#enterPass");
-    var $firstPassword = $("#firstPassword");
-    var $confirmPass = $("#confirmPass");
-    var $userForm = $("#userForm");
+    var $firstPasswordRegister = $("#firstPasswordRegister");
+    var $confirmPassRegister = $("#confirmPassRegister");
+    var $RegisterUserForm = $("#RegisterUserForm");
+    var $IsRegisteredForm = $("#IsRegisteredForm");
+    var $firstPasswordVerification = $("#firstPasswordVerification");
+    var $confirmPassVerification = $("#confirmPassVerification");
     //user does not exist, register password
     $registerUserBtn.click(function() {
         $notRegisteredPanel.hide();
         $enterPass.show();
     });
     //user exists, login
-    $("#IsRegisteredForm").on("submit",function(e){
+    $IsRegisteredForm.on("submit",function(e){
         e.preventDefault();
-
+        var user = window.location.pathname;
+        user = user.replace('/', '');
         //enter password
-        var enteredPassword = $("#registeredPasswordVerification").val();
+        var firstPassSubmit = $(this).is(".passwordNotConfirmed");
 
-        var message = {password: enteredPassword};
-        $.ajax({
-            type: 'POST',
-            url: '/verifyPassword',
-            data: message,
-            success: function(response) {
-                parsedResponse = JSON.parse(response);
-                console.log(parsedResponse);
-            }
-        });
+        if(firstPassSubmit) {
+            $(this).removeClass("passwordNotConfirmed");
+            $firstPasswordVerification.hide();
+            $confirmPassVerification.show();
+        }
+        else {
+            var password = {
+                userName: user,
+                password: $confirmPassVerification.val()
+            };
 
+            $.ajax({
+                type: 'POST',
+                url: '/verifyPassword',
+                data: password,
+                success: function(response) {
+                    // alert('verify')
+                    parsedResponse = JSON.parse(response);
+                    if(parsedResponse.success) {
+                        var page = "/"+user + "/panel";
+                        redirect(page);
+                    }
+                }
+            });
 
+        }
     });
 
 
 
-    $userForm.on("submit", function(e){
+    $RegisterUserForm.on("submit", function(e){
         e.preventDefault();
         // if user entered the first password remove .passwordNotConfirmed
-        if($(this).is(".passwordNotConfirmed")) {
+        var firstPassSubmit = $(this).is(".passwordNotConfirmed");
+        if(firstPassSubmit) {
             $(this).removeClass("passwordNotConfirmed");
-            $firstPassword.hide();
-            $confirmPass.show();
+            $confirmPassRegister.hide();
+            $confirmPassRegister.show();
         }
         //submit and does not contain .passwordNotConfirmed
         else {
             //user is submitting password
             //add a POST
-            var password = {password: $confirmPass.val()};
+            var password = {password: $confirmPassRegister.val()};
             $.ajax({
                 type: 'POST',
                 url: '/registerPassword',
                 data: password,
                 success: function(response) {
                     response = JSON.parse(response);
-                    $(this).hide();
-                    console.log(response.success);
-                    var welcome_user_html = '';
-                    if(response.success === true) {
-                        //idk what to do yet
-                        $.get("/",function(data) {
-
-                        });
+                    if(response.success) {
+                        //redirect to success
+                        var page = "/"+response.userName + "/panel";
+                        redirect(page);
                     }
                     else {
-                        alert('false')
-                        welcome_user_html = "<span>User Not Registered!</span>";
-                        $enterPass.append(welcome_user_html);
+                        //redirect to fail
                     }
                 }
             });
@@ -72,9 +85,20 @@ $(document).ready(function() {
         }
     });
 
-    $confirmPass.on("keyup", function() {
-        var matchingPass = $(this).val() == $firstPassword.val();
-        var $matchingMessage = $("#matchingMessage");
+    $confirmPassRegister.on("keyup", function() {
+        var matchingPass = $(this).val() == $firstPasswordRegister.val();
+        var $matchingMessage = $(".matchingMessage");
+        if(matchingPass) {
+            $matchingMessage.html('matching').css('color', 'green');
+        }
+        else {
+            $matchingMessage.html('matching').css('color', 'red');
+        }
+    });
+
+    $confirmPassVerification.on("keyup", function() {
+        var matchingPass = $(this).val() == $firstPasswordVerification.val();
+        var $matchingMessage = $(".matchingMessage");
         if(matchingPass) {
             $matchingMessage.html('matching').css('color', 'green');
         }
@@ -86,3 +110,7 @@ $(document).ready(function() {
 
 
 });
+
+function redirect(url){
+    window.location.href = url;
+}
