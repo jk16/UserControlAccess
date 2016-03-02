@@ -1,7 +1,7 @@
 import tornado.ioloop
 import tornado.web
 import json
-
+from random import randint
 
 
 
@@ -23,13 +23,18 @@ class User():
 
         specific = perm_tuple[1]
         operation = perm_tuple[0]
+
         operation_in_list = True if operation in self.user_permissions else False
+
         if operation_in_list:
             # add to the existing "operation": set([])
             self.user_permissions[operation].add(specific)
         else :
             self.user_permissions[operation] = set([])
             self.user_permissions[operation].add(specific)
+
+
+
     def has_permission(self, operation, specific):
         """action on a user"""
 
@@ -37,17 +42,31 @@ class User():
         { "views": set([]), "click":set([])  }
         
         """
-        return True if specific in self.user_permission[operation] else False
+        print(specific in self.user_permissions[operation])
+        return True if specific in self.user_permissions[operation] else False
 
 def test():
-    john = User('john')
-    alberto = User('alberto') 
-    alberto.add_user_permission( ("view","john") )
-    alberto.add_user_permission( ("view","leon") )
-    print(alberto.user_permissions)
+    self.application.john = User('john')
+    self.application.alberto = User('alberto') 
+    self.application.alberto.add_user_permission( ("view","john") )
+    self.application.alberto.add_user_permission( ("view","leon") )
 
-test()
 
+def createUser(name):
+    list_operations = ["user1", "user2", "user3"]
+    list_specifics = ["viewSSN", "viewPage", "viewLocation"]
+    user = User(name)
+    len_list_ops = len(list_operations) - 1
+    len_list_specifics = len(list_specifics) - 1
+
+    rand_operation = list_operations[ randint(0, len_list_ops) ]
+    rand_specific = list_specifics[ randint(0,len_list_specifics) ]
+
+    print(rand_operation, rand_specific)
+    op_spec_tuple = (rand_specific, rand_operation)
+    user.add_user_permission( op_spec_tuple)
+
+    return user
 
 def printStuff(*args):
     print(*args)
@@ -110,6 +129,9 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
         #send response
         self.write(json.dumps(response))
 
+        self.application.created_user = createUser(self.application.user)
+        
+
 
 
 class AdminLoginHandler(tornado.web.RequestHandler):
@@ -151,11 +173,22 @@ class UserLoginHandler(tornado.web.RequestHandler):
             response = {"success": False}
             self.write(json.dumps(response))
 
+        # createUser(userName)
+        self.application.created_user = createUser(userName)
+
+
 class PanelPageHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('panel.html')
 
+class HasPermissionHandler(tornado.web.RequestHandler):
+    def get(self):
+        specific = self.get_argument("specific")
+        operation = self.get_argument("operation")
 
+        has_permission = self.application.created_user.has_permission(operation, specific)
+        response = {"has_permission": has_permission}
+        self.write(json.dumps(response))
 
 def make_app():
     handlers = [
@@ -165,7 +198,8 @@ def make_app():
             (r"/user([0-9]+)", NewUserLoginHandler),
             (r"/registerPassword", NewUserLoginHandler),
             (r"/verifyPassword", UserLoginHandler),
-            (r"/user([0-9]+/panel)", PanelPageHandler),
+            (r"/panel", PanelPageHandler),
+            (r"/hasPerm", HasPermissionHandler)
 
         ]
 
