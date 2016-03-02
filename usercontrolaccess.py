@@ -8,65 +8,64 @@ from random import randint
 class User():
     def __init__(self, uName):
         self.uName = uName
-        self.user_permissions = {} #{operation: specific}
+        self.set_perm_tuples = set() #user starts with no permissions
 
+
+        ##this is for testing
+        self.list_operations = ["viewSSN", "viewPage", "viewLocation"]
+        self.list_specifics = ["user1", "user2", "user3"]
     def __repr__(self):
         return "test()"
 
     def __str__(self, *args):
         return str(*args)
 
-    def add_user_permission(self, perm_tuple):
+    def add_permission(self, perm_tuple):
         """
         Takes in a permission tuple: (operation,specific)
+        
+        Appends the permission tuple to the set of tuples
+
         """
-
-        specific = perm_tuple[1]
-        operation = perm_tuple[0]
-
-        operation_in_list = True if operation in self.user_permissions else False
-
-        if operation_in_list:
-            # add to the existing "operation": set([])
-            self.user_permissions[operation].add(specific)
-        else :
-            self.user_permissions[operation] = set([])
-            self.user_permissions[operation].add(specific)
+        self.set_perm_tuples.add(perm_tuple)
 
 
 
     def has_permission(self, operation, specific):
-        """action on a user"""
+        """
+        checks if (operation,specific) in set ( ('viewSSN', 'john'), ('viewPage', 'john') )
+        """
+        printStuff("self.user_permissions: " , self.user_permissions)
+        perm_to_check = (operation, specific)
 
-        """
-        { "views": set([]), "click":set([])  }
-        
-        """
-        print(specific in self.user_permissions[operation])
-        return True if specific in self.user_permissions[operation] else False
+        return perm_to_check in self.set_perm_tuples
 
 def test():
-    self.application.john = User('john')
-    self.application.alberto = User('alberto') 
-    self.application.alberto.add_user_permission( ("view","john") )
-    self.application.alberto.add_user_permission( ("view","leon") )
+    john = User('john')
+    alberto = User('alberto') 
+    alberto.add_user_permission( ("view","john") )
+    alberto.add_user_permission( ("view","leon") )
 
 
 def createUser(name):
-    list_operations = ["user1", "user2", "user3"]
-    list_specifics = ["viewSSN", "viewPage", "viewLocation"]
-    user = User(name)
-    len_list_ops = len(list_operations) - 1
-    len_list_specifics = len(list_specifics) - 1
+    user_instance = User(name)
 
-    rand_operation = list_operations[ randint(0, len_list_ops) ]
-    rand_specific = list_specifics[ randint(0,len_list_specifics) ]
+    # len_list_ops = len(user_instance.list_operations) - 1
+    # len_list_specifics = len(user_instance.list_specifics) - 1
 
-    print(rand_operation, rand_specific)
-    op_spec_tuple = (rand_specific, rand_operation)
-    user.add_user_permission( op_spec_tuple)
+    # rand_operation = user_instance.list_operations[ randint(0, len_list_ops) ]
+    # rand_specific = user_instance.list_specifics[ randint(0,len_list_specifics) ]
 
-    return user
+    # print(rand_operation, rand_specific)
+
+    # op_spec_tuple = (rand_specific, rand_operation)
+    # user_instance.add_user_permission( op_spec_tuple)
+
+    user_instance.add_user_permission( (user_instance.list_operations[0], user_instance.list_specifics[0]) )
+    user_instance.add_user_permission( (user_instance.list_operations[0], user_instance.list_specifics[1]) )
+    user_instance.add_user_permission( (user_instance.list_operations[1], user_instance.list_specifics[1]) )
+
+    return user_instance
 
 def printStuff(*args):
     print(*args)
@@ -196,10 +195,23 @@ class HasPermissionHandler(tornado.web.RequestHandler):
         specific = self.get_argument("specific")
         operation = self.get_argument("operation")
 
-        has_permission = self.application.created_user.has_permission(operation, specific)
-        response = {"has_permission": has_permission}
-        self.write(json.dumps(response))
 
+        # printStuff("list_specifics: " , self.application.created_user.list_specifics)
+        # printStuff("list_operations: " , self.application.created_user.list_operations)
+
+
+        spec_not_in_list = specific not in self.application.created_user.list_specifics
+        op_not_in_list = operation not in self.application.created_user.list_operations
+
+        if spec_not_in_list or op_not_in_list:
+            response = {"has_permission": False, "message":"Specific or Operation does not exist!"}
+            self.write(json.dumps(response))
+        else:
+            has_permission = self.application.created_user.has_permission(operation, specific)
+            message = "Accepted" if has_permission else "Not Accepted"
+            response = {"has_permission": has_permission, "message": message}
+            self.write(json.dumps(response))
+            
 def make_app():
     handlers = [
             (r"/", HomePage),
