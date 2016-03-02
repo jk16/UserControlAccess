@@ -95,19 +95,29 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
             #stores "users": [ { "user111": 1} ]
             self.application.list_of_dict_users = d['users']
 
+        self.application.userInJSON = False
 
+
+        #for each user in the list of the user dictionaries: {'user2': '1'}
         for usernameDict in self.application.list_of_dict_users:
-            self.application.userInJSON = any( userName == self.application.user for userName in usernameDict )
+            #if the users are the same
             if self.application.userInJSON:
-                self.application.password = usernameDict[self.application.user]
-
-
-        #render user.html which will load HTML based off userInJSON
-        self.render(
-            'user.html',
-            memberVal = "user" + str(id_),
-            userInJSON = self.application.userInJSON,
-            )
+                break
+            #for a user in the user dictionary: 'user2'
+            for userName in usernameDict:
+                #are the users the same?
+                self.application.userInJSON = userName == self.application.user
+                #if they are the same
+                if self.application.userInJSON:
+                    #get the password
+                    self.application.password = usernameDict[self.application.user]
+                    #render user.html which will load HTML based off userInJSON
+                    self.render(
+                        'user.html',
+                        memberVal = "user" + str(id_),
+                        userInJSON = self.application.userInJSON,
+                        )
+                    break
 
     def post(self):
         #get password from POST
