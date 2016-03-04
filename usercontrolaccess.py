@@ -31,20 +31,13 @@ class User():
 
 
 
-    def has_permission(self, operation, specific):
+    def has_permission(self, perm_tuple):
         """
         checks if (operation,specific) in set ( ('viewSSN', 'john'), ('viewPage', 'john') )
         """
-        printStuff("self.user_permissions: " , self.user_permissions)
-        perm_to_check = (operation, specific)
+        perm_to_check = perm_tuple
 
         return perm_to_check in self.set_perm_tuples
-
-def test():
-    john = User('john')
-    alberto = User('alberto') 
-    alberto.add_user_permission( ("view","john") )
-    alberto.add_user_permission( ("view","leon") )
 
 
 def createUser(name):
@@ -61,10 +54,10 @@ def createUser(name):
     # op_spec_tuple = (rand_specific, rand_operation)
     # user_instance.add_user_permission( op_spec_tuple)
 
-    user_instance.add_user_permission( (user_instance.list_operations[0], user_instance.list_specifics[0]) )
-    user_instance.add_user_permission( (user_instance.list_operations[0], user_instance.list_specifics[1]) )
-    user_instance.add_user_permission( (user_instance.list_operations[1], user_instance.list_specifics[1]) )
-
+    user_instance.add_permission( (user_instance.list_operations[0], user_instance.list_specifics[0]) )
+    user_instance.add_permission( (user_instance.list_operations[0], user_instance.list_specifics[1]) )
+    user_instance.add_permission( (user_instance.list_operations[1], user_instance.list_specifics[1]) )
+    printStuff("user permissions: " , (user_instance.set_perm_tuples))
     return user_instance
 
 def printStuff(*args):
@@ -194,24 +187,27 @@ class HasPermissionHandler(tornado.web.RequestHandler):
     def get(self):
         specific = self.get_argument("specific")
         operation = self.get_argument("operation")
+        created_user = self.application.created_user
 
+        perm_to_check = (operation, specific)
+        user_has_perm = created_user.has_permission(perm_to_check)
 
-        # printStuff("list_specifics: " , self.application.created_user.list_specifics)
-        # printStuff("list_operations: " , self.application.created_user.list_operations)
-
-
-        spec_not_in_list = specific not in self.application.created_user.list_specifics
-        op_not_in_list = operation not in self.application.created_user.list_operations
-
-        if spec_not_in_list or op_not_in_list:
-            response = {"has_permission": False, "message":"Specific or Operation does not exist!"}
+        if user_has_perm:
+            response = {"has_permission": True, "message":"User has permission"}
             self.write(json.dumps(response))
         else:
-            has_permission = self.application.created_user.has_permission(operation, specific)
-            message = "Accepted" if has_permission else "Not Accepted"
-            response = {"has_permission": has_permission, "message": message}
+            response = {"has_permission": False, "message":"User doesnt has permission"}
             self.write(json.dumps(response))
-            
+
+class AddPermissionHandler(tornado.web.RequestHandler):
+    def get(self):
+        specific = self.get_argument("specific")
+        operation = self.get_argument("operation")
+        created_user = self.application.created_user
+        response = {"success": "User Added!"}
+        self.write(json.dumps(response))
+
+
 def make_app():
     handlers = [
             (r"/", HomePage),
@@ -221,7 +217,8 @@ def make_app():
             (r"/registerPassword", NewUserLoginHandler),
             (r"/verifyPassword", UserLoginHandler),
             (r"/panel", PanelPageHandler),
-            (r"/hasPerm", HasPermissionHandler)
+            (r"/hasPerm", HasPermissionHandler),
+            (r"/addPerm", AddPermissionHandler),
 
         ]
 
