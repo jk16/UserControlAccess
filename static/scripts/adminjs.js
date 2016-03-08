@@ -1,63 +1,56 @@
 $(document).ready(function() {
-    $adminForm = $("#adminForm");
-    $adminUser = $("#adminUser");
-    $adminPass = $("#adminPass");
+    var $adminForm = $("#AdminForm");
+    var $adminUser = $("#adminUser");
+    var $adminPass = $("#adminPass");
+    var $firstPasswordVerification = $("#firstPasswordVerification");
+    var $confirmPassVerification = $("#confirmPassVerification");
 
+    $adminForm.on("submit", function(e){
+        e.preventDefault();
+        //enter password
+        var firstPassSubmit = $(this).is(".passwordNotConfirmed");
 
-    $adminForm.on('submit', function(e) {
-        if($adminForm.is(".userStep")) {
-            e.preventDefault();
-            $adminForm.removeClass("userStep");
-            $adminUser.hide();
-            $adminPass.show();
-        }
+        if(firstPassSubmit) {
+            $(this).removeClass("passwordNotConfirmed");
+            $firstPasswordVerification.hide();
+            $confirmPassVerification.show();
+        } 
         else {
-            e.preventDefault();
-            $adminPass.hide();
 
+            var password ={ password:$confirmPassVerification.val()};
 
-            userandpass = {
-                user: $("#adminUser input").val(),
-                pass: $("#adminPass input").val()
-            };
-
-            //post to send login data to server
             $.ajax({
                 type: 'POST',
                 url: '/adminCreds',
-                data: userandpass,
+                data: password,
                 success: function(response) {
-                    if(response.success) {
-                        //get request for data, then load html
-                        $.ajax({
-                            type: "POST",
-                            url: "/getListUsers",
-                            data: {"message": }
-                            success: function(response) {
-
-                            }
-                        });
+                    parsedResponse = JSON.parse(response);
+                    if(parsedResponse.success) {
+                        redirect("/panel");
                     }
-                    else {
-
-                    }
-                },
-                error: function(response) {
-                    alert("error");
-                    console.log("error --> response: " + JSON.parse(response));
                 }
             });
-        }
 
+        }
     });
 
+    $confirmPassVerification.on("keyup", function() {
+        var matchingPass = $(this).val() == $firstPasswordVerification.val();
+        var $matchingMessage = $(".matchingMessage");
+        if(matchingPass) {
+            $matchingMessage.html('matching').css('color', 'green');
+        }
+        else {
+            $matchingMessage.html('matching').css('color', 'red');
+        }
+    });
 
 });
 
 
-
-
-
+function redirect(url){
+    window.location.href = url;
+}
 
 
 

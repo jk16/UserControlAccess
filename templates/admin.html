@@ -8,22 +8,15 @@
 </head>
 <body>
 	<div>
-		<div id="adminLoginPanel" >
+	    <div id="adminLoginPanel" >
+	        <form id="AdminForm" class="passwordNotConfirmed">
+	            <input type="password" name="verifyUserPass" placeholder="Password" id="firstPasswordVerification">
+	            <input type="password" name="confirmRegisteredUserPass" placeholder="Confirm password" id="confirmPassVerification" style="display:none">
+	            <span class='matchingMessage'></span>
+	            <input type="submit" style="display:none">
+	        </form>
 
-			<form id="adminForm" class="userStep">
-
-				<div id="adminUser">
-					<input type="text" name="adminUser" value="Admin">
-				</div>
-
-				<div id="adminPass" style="display:none">
-					<input type="password" name="adminPass" placeholder="Password">
-				</div>
-
-				<input type="submit" value="Login" style="display:none">
-			</form>
-
-		</div>
+	    </div>
 	</div>
 </body>
 </html>
