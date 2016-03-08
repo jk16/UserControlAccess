@@ -138,16 +138,15 @@ class AdminLoginHandler(tornado.web.RequestHandler):
     def post(self):
         count_login_attempts = 0
 
-        username = self.get_argument('user')
-        password = self.get_argument('pass')
-        credsPassed = username == 'Admin' and password == '0'
+        password = self.get_argument('password')
+        credsPassed = password == '0'
 
         if (credsPassed):
-            response = {"success": True, "user": username, "password": password}
+            response = {"success": True}
             self.write(json.dumps(response))     
         else:
             count_login_attempts +=1
-            response = {"success": False, "user": username, "password": password}
+            response = {"success": False, "count_login_attempts": count_login_attempts}
             self.write(json.dumps(response))
 
 class UserLoginHandler(tornado.web.RequestHandler):
