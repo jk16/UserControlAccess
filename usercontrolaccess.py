@@ -71,7 +71,8 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
     """
     GET: handles logic for whether a /user is in the JSON data list
     POST: handles user adding a password
-    """
+    """ 
+
     def get(self, id_):
         #get ID from /user[0-9]+
         self.application.user = "user" + id_
@@ -87,29 +88,23 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
             #stores "users": [ { "user111": 1} ]
             self.application.list_of_dict_users = d['users']
 
-        self.application.userInJSON = False
+        def build_set_users(list_of_users):
+            set_key_to_return = set([])
+            for user_pass_dict in list_of_users:
+                for user in user_pass_dict:
+                    set_key_to_return.add(user)
+            return set_key_to_return
 
+        list_of_dict_users = self.application.list_of_dict_users
+        set_of_user_names = build_set_users(list_of_dict_users)
+        self.application.userInJSON = any(self.application.user == user for user in set_of_user_names)
 
-        #for each user in the list of the user dictionaries: {'user2': '1'}
-        for usernameDict in self.application.list_of_dict_users:
-            #if the users are the same
-            if self.application.userInJSON:
-                break
-            #for a user in the user dictionary: 'user2'
-            for userName in usernameDict:
-                #are the users the same?
-                self.application.userInJSON = userName == self.application.user
-                #if they are the same
-                if self.application.userInJSON:
-                    #get the password
-                    self.application.password = usernameDict[self.application.user]
-                    #render user.html which will load HTML based off userInJSON
-                    self.render(
-                        'user.html',
-                        memberVal = "user" + str(id_),
-                        userInJSON = self.application.userInJSON,
-                        )
-                    break
+        self.render(
+            'user.html',
+            memberVal = "user" + str(id_),
+            userInJSON = self.application.userInJSON,
+            )
+                    
 
     def post(self):
         #get password from POST
