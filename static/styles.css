@@ -1,18 +1,19 @@
 body {
 	background-color: #0f0f23;
 	font-family: "Source Code Pro", monospace;
+	color: #fff;
 }
 
 input,button {
 	font-family: "Source Code Pro", monospace;
-  border: 0;
-  background-color: inherit;
-  border-bottom: 1px solid #fff;
-  color: #fff;
+	border: 0;
+	background-color: inherit;
+	border-bottom: 1px solid #fff;
+	color: #fff;
 }
 
 button {
-  border-bottom:none;
+ 	border-bottom:none;
 }
 textarea, input { outline: none; }
 

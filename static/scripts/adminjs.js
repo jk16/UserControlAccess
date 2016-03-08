@@ -28,7 +28,15 @@ $(document).ready(function() {
                 data: userandpass,
                 success: function(response) {
                     if(response.success) {
-                        // loadAdminHTML();
+                        //get request for data, then load html
+                        $.ajax({
+                            type: "POST",
+                            url: "/getListUsers",
+                            data: {"message": }
+                            success: function(response) {
+
+                            }
+                        });
                     }
                     else {
 
@@ -45,7 +53,6 @@ $(document).ready(function() {
 
 
 });
-
 
 
 
