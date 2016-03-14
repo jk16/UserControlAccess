@@ -3,8 +3,6 @@ import tornado.web
 import json
 from random import randint
 
-
-
 class User():
     def __init__(self, uName):
         self.uName = uName
@@ -58,6 +56,7 @@ def createUser(name):
     user_instance.add_permission( (user_instance.list_operations[0], user_instance.list_specifics[1]) )
     user_instance.add_permission( (user_instance.list_operations[1], user_instance.list_specifics[1]) )
     printStuff("user permissions: " , (user_instance.set_perm_tuples))
+
     return user_instance
 
 def printStuff(*args):
@@ -65,7 +64,10 @@ def printStuff(*args):
 
 class HomePage(tornado.web.RequestHandler):
     def get(self):
-        self.render('index.html')
+        self.render(
+            'index.html',
+            admin_failed = self.application.admin_failed
+            )
 
 class NewUserLoginHandler(tornado.web.RequestHandler):
     """
@@ -104,7 +106,6 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
             memberVal = "user" + str(id_),
             userInJSON = self.application.userInJSON,
             )
-                    
 
     def post(self):
         #get password from POST
@@ -127,27 +128,8 @@ class NewUserLoginHandler(tornado.web.RequestHandler):
         self.write(json.dumps(response))
 
         self.application.created_user = createUser(self.application.user)
-        
 
 
-
-class AdminLoginHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("admin.html")
-
-    def post(self):
-        count_login_attempts = 0
-
-        password = self.get_argument('password')
-        credsPassed = password == '0'
-
-        if (credsPassed):
-            response = {"success": True}
-            self.write(json.dumps(response))     
-        else:
-            count_login_attempts +=1
-            response = {"success": False, "count_login_attempts": count_login_attempts}
-            self.write(json.dumps(response))
 
 class UserLoginHandler(tornado.web.RequestHandler):
     def post(self):
@@ -172,10 +154,36 @@ class UserLoginHandler(tornado.web.RequestHandler):
         # createUser(userName)
         self.application.created_user = createUser(userName)
 
-
-class PanelPageHandler(tornado.web.RequestHandler):
+class AdminLoginHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('panel.html')
+        self.render("admin.html")
+
+    def post(self):
+
+        admin_password = self.get_argument('password')
+        creds_passed = admin_password == '0'
+        ##set admin/pass cookies
+        has_admin_cookie = self.get_cookie("admin")
+        if not has_admin_cookie and creds_passed:
+            self.set_cookie("admin","0")
+
+        if creds_passed:
+            response = {"success": True}
+            self.write(json.dumps(response))
+        else:
+            response = {"success": False}
+            self.write(json.dumps(response))
+
+class AdminPanelPageHandler(tornado.web.RequestHandler):
+    def get(self):
+        password_correct = self.get_cookie("admin") == "0"
+        if password_correct:
+            self.application.admin_failed = False
+            self.render('crudpanel.html')
+        else:
+            self.application.admin_failed = True
+            self.redirect('/')
+
 
 class HasPermissionHandler(tornado.web.RequestHandler):
     def get(self):
@@ -190,7 +198,7 @@ class HasPermissionHandler(tornado.web.RequestHandler):
             response = {"has_permission": True, "message":"User has permission"}
             self.write(json.dumps(response))
         else:
-            response = {"has_permission": False, "message":"User doesnt has permission"}
+            response = {"has_permission": False, "message":"User doesnt have permission"}
             self.write(json.dumps(response))
 
 class AddPermissionHandler(tornado.web.RequestHandler):
@@ -201,6 +209,9 @@ class AddPermissionHandler(tornado.web.RequestHandler):
         response = {"success": "User Added!"}
         self.write(json.dumps(response))
 
+class PermissionPanelHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('permpanel.html')
 
 def make_app():
     handlers = [
@@ -210,14 +221,19 @@ def make_app():
             (r"/user([0-9]+)", NewUserLoginHandler),
             (r"/registerPassword", NewUserLoginHandler),
             (r"/verifyPassword", UserLoginHandler),
-            (r"/panel", PanelPageHandler),
+            (r"/crudpanel", AdminPanelPageHandler),
             (r"/hasPerm", HasPermissionHandler),
             (r"/addPerm", AddPermissionHandler),
+            (r"/permpanel", PermissionPanelHandler),
 
         ]
 
-    return tornado.web.Application(handlers,debug=True,template_path='./templates',
+    app = tornado.web.Application(handlers,debug=True,template_path='./templates',
             static_path='./static',static_url_prefix='/static/')
+
+    app.admin_failed = False
+
+    return app
 
 def main():
     app = make_app()
