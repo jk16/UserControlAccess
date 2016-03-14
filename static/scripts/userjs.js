@@ -40,7 +40,7 @@ $(document).ready(function() {
                     // alert('verify')
                     parsedResponse = JSON.parse(response);
                     if(parsedResponse.success) {
-                        redirect("/panel");
+                        redirect("/permpanel");
                     }
                 }
             });
@@ -50,38 +50,38 @@ $(document).ready(function() {
 
 
 
-    // $RegisterUserForm.on("submit", function(e){
-    //     e.preventDefault();
-    //     // if user entered the first password remove .passwordNotConfirmed
-    //     var firstPassSubmit = $(this).is(".passwordNotConfirmed");
-    //     if(firstPassSubmit) {
-    //         $(this).removeClass("passwordNotConfirmed");
-    //         $confirmPassRegister.hide();
-    //         $confirmPassRegister.show();
-    //     }
-    //     //submit and does not contain .passwordNotConfirmed
-    //     else {
-    //         //user is submitting password
-    //         //add a POST
-    //         var password = {password: $confirmPassRegister.val()};
-    //         $.ajax({
-    //             type: 'POST',
-    //             url: '/registerPassword',
-    //             data: password,
-    //             success: function(response) {
-    //                 response = JSON.parse(response);
-    //                 if(response.success) {
-    //                     //redirect to success
-    //                     redirect("/panel");
-    //                 }
-    //                 else {
-    //                     //redirect to fail
-    //                 }
-    //             }
-    //         });
-    //         //on success promt to a new page
-    //     }
-    // });
+    $RegisterUserForm.on("submit", function(e){
+        e.preventDefault();
+        // if user entered the first password remove .passwordNotConfirmed
+        var firstPassSubmit = $(this).is(".passwordNotConfirmed");
+        if(firstPassSubmit) {
+            $(this).removeClass("passwordNotConfirmed");
+            $confirmPassRegister.hide();
+            $confirmPassRegister.show();
+        }
+        //submit and does not contain .passwordNotConfirmed
+        else {
+            //user is submitting password
+            //add a POST
+            var password = {password: $confirmPassRegister.val()};
+            $.ajax({
+                type: 'POST',
+                url: '/registerPassword',
+                data: password,
+                success: function(response) {
+                    response = JSON.parse(response);
+                    if(response.success) {
+                        //redirect to success
+                        redirect("/permpanel");
+                    }
+                    else {
+                        //redirect to fail
+                    }
+                }
+            });
+            //on success promt to a new page
+        }
+    });
 
     $confirmPassRegister.on("keyup", function() {
         var matchingPass = $(this).val() == $firstPasswordRegister.val();
