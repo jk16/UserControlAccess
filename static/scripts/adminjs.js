@@ -24,9 +24,12 @@ $(document).ready(function() {
                 url: '/adminCreds',
                 data: password,
                 success: function(response) {
-                    parsedResponse = JSON.parse(response);
+                    var parsedResponse = JSON.parse(response);
                     if(parsedResponse.success) {
-                        redirect("/panel");
+                        redirect('/crudpanel');
+                    }
+                    else {
+                        redirect('/');
                     }
                 }
             });
